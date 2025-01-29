@@ -1,33 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import Home from '../components/home/page'
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [Authentificated, setAuth] = useState(false);
+  useEffect(() => {
+    const isLoggedIn = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/check_auth",
+          {
+            method: 'GET',
+            credentials: "include",
+          }
+        );
+        if (res.status == 200) setAuth(true);
+      } catch (e) {
+        console.log("error ", e)
+      }
+    }
+    isLoggedIn();
+  }, [])
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <BrowserRouter>
+        <Routes>
+          {
+            (!Authentificated) ?
+              <Route path='/' element={<Home />} />
+              :
+              <Route path='/'>
+                <Route index element={<p>this is chat actually</p>} />
+              </Route>
+
+          }
+        </Routes>
+      </BrowserRouter>
+
     </>
   )
 }
